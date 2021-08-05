@@ -438,8 +438,10 @@ local function createBind(option, parent)
 				loop = runService.Heartbeat:connect(function()
 					if binding then
 						option.callback(true)
-						loop:disconnect()
-						loop = nil
+						pcall(function()
+							loop:Disconnect()
+						end)
+						--loop = nil
 					else
 						option.callback()
 					end
@@ -467,7 +469,9 @@ local function createBind(option, parent)
 	inputService.InputEnded:connect(function(input)
 		if input.KeyCode.Name == option.key or input.UserInputType.Name == option.key or input.UserInputType.Name == "MouseMovement" then
 			if loop then
-				loop:disconnect()
+				pcall(function()
+					loop:Disconnect()
+				end)
 				--loop = nil
 				option.callback(true)
 			end
@@ -476,9 +480,9 @@ local function createBind(option, parent)
 
 	function option:SetKey(key)
 		binding = false
-		if loop then
-			loop:disconnect()
-			loop = nil
+		if loop.Disconnect then
+			loop:Disconnect()
+			--loop = nil
 		end
 		self.key = key or self.key
 		self.key = self.key.Name or self.key
@@ -1517,31 +1521,31 @@ local function getFnctions(parent)
 		return option
 	end
 
-	function parent:AddButton(option)
-		option = typeof(option) == "table" and option or {}
-		option.text = tostring(option.text)
-		option.callback = typeof(option.callback) == "function" and option.callback or function() end
-		option.type = "button"
-		option.position = #self.options
-		option.flag = option.flag or option.text
-		table.insert(self.options, option)
+	function parent:AddButton(_option)
+		_option = typeof(_option) == "table" and _option or {}
+		_option.text = tostring(_option.text)
+		_option.callback = typeof(_option.callback) == "function" and _option.callback or function() end
+		_option.type = "button"
+		_option.position = #self.option
+		_option.flag = _option.flag or _option.text
+		table.insert(self.options, _option)
 
-		return option
+		return _option
 	end
 
-	function parent:AddBind(option)
-		option = typeof(option) == "table" and option or {}
-		option.text = tostring(option.text)
-		option.key = (option.key and option.key.Name) or option.key or "F"
-		option.hold = typeof(option.hold) == "boolean" and option.hold or false
-		option.callback = typeof(option.callback) == "function" and option.callback or function() end
-		option.type = "bind"
-		option.position = #self.options
-		option.flag = option.flag or option.text
-		library.flags[option.flag] = option.key
-		table.insert(self.options, option)
+	function parent:AddBind(_Option)
+		_Option = typeof(_Option) == "table" and _Option or {}
+		_Option.text = tostring(_Option.text)
+		_Option.key = (_Option.key and _Option.key.Name) or _Option.key or "F"
+		_Option.hold = typeof(_Option.hold) == "boolean" and _Option.hold or false
+		_Option.callback = typeof(_Option.callback) == "function" and _Option.callback or function() end
+		_Option.type = "bind"
+		_Option.position = #self.options
+		_Option.flag = _Option.flag or _Option.text
+		library.flags[_Option.flag] = _Option.key
+		table.insert(self.options, _Option)
 
-		return option
+		return _Option
 	end
 
 	function parent:AddSlider(option)
